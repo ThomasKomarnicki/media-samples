@@ -20,7 +20,10 @@ import android.app.PictureInPictureParams
 import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.Rect
+import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.MediaSessionCompat
@@ -116,6 +119,21 @@ class MovieActivity : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
         initializeMediaSession()
+
+        Handler(Looper.getMainLooper()).postDelayed({
+            bug1_startActivityBeforeEnteringPiPMode()
+//            bug2_startActivityAfterEnteringPiPMode()
+        }, 5000)
+    }
+
+    private fun bug1_startActivityBeforeEnteringPiPMode() {
+        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://google.com")).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+        enterPictureInPictureMode(updatePictureInPictureParams())
+    }
+
+    private fun bug2_startActivityAfterEnteringPiPMode() {
+        enterPictureInPictureMode(updatePictureInPictureParams())
+        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://google.com")))
     }
 
     private fun initializeMediaSession() {
